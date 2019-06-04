@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'dart:math' as math;
 
 void main() => runApp(MyApp());
 
@@ -170,7 +171,232 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class ContainerRoute extends {}
+class ContainerRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("容器类widget"),
+      ),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            FlatButton(
+              child: Text("padding"),
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new PaddingTestRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("布局限制ConstrainedBox/SizeBox"),
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new ConstrainedBoxRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("装饰容器DecoratedBox"),
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new DecoratedBoxRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("变换Transform"),
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new TransformPageRoute();
+                }));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+//Transform的变换是应用在绘制阶段，而并不是应用在布局(layout)阶段，
+// 所以无论对子widget应用何种变化，其占用空间的大小和在屏幕上的位置都是固定不变的，因为这些是在布局阶段就确定的。
+class TransformPageRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Transform变换"),
+      ),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 50.0, bottom: 50.0),
+              child: Container(
+                color: Colors.black,
+                child: new Transform(
+                  alignment: Alignment.topRight, //相对于坐标系原点的对齐方式
+                  transform: new Matrix4.skewY(0.3), //沿Y轴倾斜0.3弧度
+                  child: new Container(
+                    padding: const EdgeInsets.all(8.0),
+                    color: Colors.deepOrange,
+                    child: const Text('Apartment for rent!'),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 50.0),
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: Colors.red),
+                //默认原点为左上角，左移20像素，向上平移5像素
+                child: Transform.translate(
+                  offset: Offset(-20.0, -5.0),
+                  child: Text("Hello world"),
+                ),
+              ),
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(color: Colors.red),
+              child: Transform.rotate(
+                //旋转90度
+                angle: math.pi / 2,
+                child: Text("Hello world"),
+              ),
+            ),
+            //RotatedBox和Transform.rotate功能相似，它们都可以对子widget进行旋转变换，
+            // 但是有一点不同：RotatedBox的变换是在layout阶段，
+            // 会影响在子widget的位置和大小。
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                DecoratedBox(
+                  decoration: BoxDecoration(color: Colors.red),
+                  //将Transform.rotate换成RotatedBox
+                  child: RotatedBox(
+                    quarterTurns: 1, //旋转90度(1/4圈)
+                    child: Text("Hello world"),
+                  ),
+                ),
+                Text(
+                  "你好",
+                  style: TextStyle(color: Colors.green, fontSize: 18.0),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DecoratedBoxRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("装饰容器DecoratedBox"),
+      ),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            DecoratedBox(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [Colors.red, Colors.orange[700]]), // 背景渐变
+                  borderRadius: BorderRadius.circular(3.0), // 3像素圆角
+                  boxShadow: [
+                    //阴影
+                    BoxShadow(
+                        color: Colors.black54,
+                        offset: Offset(2.0, 2.0),
+                        blurRadius: 4.0)
+                  ]),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 18.0),
+                child: Text(
+                  "Login",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ConstrainedBoxRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("ConstrainedBox"),
+        actions: <Widget>[
+          UnconstrainedBox(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                valueColor: AlwaysStoppedAnimation(Colors.white70),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class PaddingTestRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("padding"),
+        ),
+        body: Center(
+          child: Column(
+            children: <Widget>[
+              Padding(
+                //上下左右各添加16像素
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  // 显示指定对齐方式为左对齐，排除对齐干扰
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      // 左边添加8像素补白
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text("Hello world"),
+                    ),
+                    Padding(
+                      // 上下各添加8像素补白
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text("I am Jack"),
+                    ),
+                    Padding(
+                      // 分别指定四个方向的补白
+                      padding: const EdgeInsets.fromLTRB(20.0, .0, 20.0, 20.0),
+                      child: Text("Your friend"),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ));
+  }
+}
 
 class LayoutRoute extends StatelessWidget {
   @override

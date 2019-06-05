@@ -13,6 +13,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      showSemanticsDebugger: false,
+      debugShowMaterialGrid: false,
+      checkerboardOffscreenLayers: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -217,10 +220,228 @@ class ContainerRoute extends StatelessWidget {
                 }));
               },
             ),
+            FlatButton(
+              child: Text("Container容器"),
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new ContainerWidgetRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("Scaffold/TabBar/底部导航"),
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                      return new ScaffoldRoute();
+                    }));
+              },
+            ),
           ],
         ),
       ),
     );
+  }
+}
+
+class ScaffoldRoute extends StatefulWidget {
+  @override
+  _ScaffoldRouteState createState() => _ScaffoldRouteState();
+}
+
+class _ScaffoldRouteState extends State<ScaffoldRoute> with SingleTickerProviderStateMixin{
+  int _selectedIndex = 1;
+  TabController _tabController; //需要定义一个Controller
+  List tabs = ["新闻", "历史", "图片"];
+  
+  @override
+  void initState() {
+    super.initState();
+    // 创建Controller
+    _tabController = TabController(length: tabs.length, vsync: this);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar( //导航栏
+        bottom: TabBar(   //生成Tab菜单
+            controller: _tabController,
+            tabs: tabs.map((e) => Tab(text: e)).toList()
+        ),
+        title: Text("App Name"),
+        leading: Builder(builder: (context) {
+          return IconButton(
+            icon: Icon(Icons.dashboard, color: Colors.white), //自定义图标
+            onPressed: () {
+              // 打开抽屉菜单
+              Scaffold.of(context).openDrawer();
+            },
+          );
+        }),
+        actions: <Widget>[ //导航栏右侧菜单
+          IconButton(icon: Icon(Icons.share), onPressed: () {}),
+        ],
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: tabs.map((e) { //创建3个Tab页
+          return Container(
+            alignment: Alignment.center,
+            child: Text(e, textScaleFactor: 5),
+          );
+        }).toList(),
+      ),
+      drawer: new MyDrawer(), //抽屉
+//      bottomNavigationBar: BottomNavigationBar( // 底部导航
+//        items: <BottomNavigationBarItem>[
+//          BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
+//          BottomNavigationBarItem(icon: Icon(Icons.business), title: Text('Business')),
+//          BottomNavigationBarItem(icon: Icon(Icons.school), title: Text('School')),
+//        ],
+//        currentIndex: _selectedIndex,
+//        fixedColor: Colors.blue,
+//        onTap: _onItemTapped,
+//      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        shape: CircularNotchedRectangle(), // 底部导航栏打一个圆形的洞
+        child: Row(
+          children: [
+            IconButton(icon: Icon(Icons.home)),
+            SizedBox(), //中间位置空出
+            IconButton(icon: Icon(Icons.business)),
+          ],
+          mainAxisAlignment: MainAxisAlignment.spaceAround, //均分底部导航栏横向空间
+        ),
+      ),
+      //打洞
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .centerDocked,
+      floatingActionButton: FloatingActionButton( //悬浮按钮
+        child: Icon(Icons.add),
+        onPressed: _onAdd,
+      ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+  void _onAdd(){
+  }
+}
+
+class MyDrawer extends StatelessWidget {
+  const MyDrawer({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: MediaQuery.removePadding(
+        context: context,
+        // DrawerHeader consumes top MediaQuery padding.
+        removeTop: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 38.0),
+              child: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ClipOval(
+                      child: Image.asset(
+                        "imgs/avatar.png",
+                        width: 80,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    "Wendux",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.add),
+                    title: const Text('Add account'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text('Manage accounts'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ContainerWidgetRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Container"),
+        ),
+        body: Column(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 50.0, left: 20.0),
+              //容器外补白
+              constraints: BoxConstraints.tightFor(width: 200.0, height: 150.0),
+              //卡片大小
+              decoration: BoxDecoration(
+                  //背景装饰
+                  gradient: RadialGradient(
+                      colors: [Colors.red, Colors.orange],
+                      center: Alignment.topLeft,
+                      radius: .98),
+                  boxShadow: [
+                    // 卡片阴影
+                    BoxShadow(
+                        color: Colors.black54,
+                        offset: Offset(2.0, 2.0),
+                        blurRadius: 4.0)
+                  ]),
+              transform: Matrix4.rotationZ(.2),
+              //卡片倾斜变换
+              alignment: Alignment.center,
+              //卡片内文字居中
+              child: Text(
+                //卡片文字
+                "5.20", style: TextStyle(color: Colors.white, fontSize: 40.0),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: Container(
+                margin: EdgeInsets.all(20.0), //容器外补白
+                color: Colors.orange,
+                child: Text("Hello world!"),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(20.0), //容器内补白
+              color: Colors.orange,
+              child: Text("Hello world!"),
+            ),
+          ],
+        ));
   }
 }
 

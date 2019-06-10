@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:math' as math;
 
+import 'InheritedWidget.dart';
+import 'LoginTestRoute.dart';
+import 'PointerEventRoute.dart';
+import 'ThemeTestRoute.dart';
+
 void main() => runApp(MyApp());
 
 BuildContext mContext = null;
@@ -140,8 +145,6 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text("布局类Widgets"),
               textColor: Colors.blue,
               onPressed: () {
-//                Navigator.of(context).pushNamed("new_page", arguments: "hi");
-//                Navigator.pushNamed(context, "new_page");
                 Navigator.push(context,
                     new MaterialPageRoute(builder: (context) {
                   return new LayoutRoute();
@@ -152,12 +155,50 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text("容器类Widgets"),
               textColor: Colors.blue,
               onPressed: () {
-//                Navigator.of(context).pushNamed("new_page", arguments: "hi");
-//                Navigator.pushNamed(context, "new_page");
                 Navigator.push(context,
                     new MaterialPageRoute(builder: (context) {
                   return new ContainerRoute();
                 }));
+              },
+            ),
+            FlatButton(
+              child: Text("可滚动Widgets"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new ScrollableRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("功能型Widgets"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new FunctionalWidgetRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("事件处理与通知"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                      return new PointerParentRoute();
+                    }));
+              },
+            ),
+            FlatButton(
+              child: Text("MyTest"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                      return new LoginTestRoute();
+                    }));
               },
             ),
             RandomWordsWidget(),
@@ -170,6 +211,503 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class FunctionalWidgetRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("功能型Widgets"),
+      ),
+      body: Column(
+        children: <Widget>[
+          FlatButton(
+            child: Text("导航返回拦截WillPopScope"),
+            textColor: Colors.blue,
+            onPressed: () {
+              Navigator.push(context, new MaterialPageRoute(builder: (context) {
+                return new WillPopScopeTestRoute();
+              }));
+            },
+          ),
+          FlatButton(
+            child: Text("数据共享InheritedWidget"),
+            textColor: Colors.blue,
+            onPressed: () {
+              Navigator.push(context, new MaterialPageRoute(builder: (context) {
+                return new InheritedWidgetTestRoute();
+              }));
+            },
+          ),
+          FlatButton(
+            child: Text("主题Theme"),
+            textColor: Colors.blue,
+            onPressed: () {
+              Navigator.push(context, new MaterialPageRoute(builder: (context) {
+                return new ThemeTestRoute();
+              }));
+            },
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class WillPopScopeTestRoute extends StatefulWidget {
+  @override
+  WillPopScopeTestRouteState createState() {
+    return new WillPopScopeTestRouteState();
+  }
+}
+
+class WillPopScopeTestRouteState extends State<WillPopScopeTestRoute> {
+  DateTime _lastPressedAt; //上次点击时间
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        appBar: AppBar(
+          title: Text("导航返回拦截"),
+        ),
+        body: new WillPopScope(
+            onWillPop: () async {
+              if (_lastPressedAt == null ||
+                  DateTime.now().difference(_lastPressedAt) >
+                      Duration(seconds: 1)) {
+                //两次点击间隔超过1秒则重新计时
+                _lastPressedAt = DateTime.now();
+                return false;
+              }
+              return true;
+            },
+            child: Container(
+              alignment: Alignment.center,
+              child: Text("1秒内连续按两次返回键退出"),
+            )));
+  }
+}
+
+class ScrollableRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("可滚动Widgets"),
+        ),
+        body: Column(
+          children: <Widget>[
+            FlatButton(
+              child: Text("ScrollView"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new ScrollViewRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("ListView"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new ListViewRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("GridView"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new GridViewRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("CustomScrollView"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new CustomScrollViewTestRoute();
+                }));
+              },
+            ),
+            FlatButton(
+              child: Text("滚动监听及控制ScrollController"),
+              textColor: Colors.blue,
+              onPressed: () {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) {
+                  return new ScrollControllerTestRoute();
+                }));
+              },
+            ),
+          ],
+        ));
+  }
+}
+
+class ScrollControllerTestRoute extends StatefulWidget {
+  @override
+  ScrollControllerTestRouteState createState() {
+    return new ScrollControllerTestRouteState();
+  }
+}
+
+class ScrollControllerTestRouteState extends State<ScrollControllerTestRoute> {
+  ScrollController _controller = new ScrollController();
+  bool showToTopBtn = false; //是否显示“返回到顶部”按钮
+
+  @override
+  void initState() {
+    //监听滚动事件，打印滚动位置
+    _controller.addListener(() {
+      print(_controller.offset); //打印滚动位置
+      if (_controller.offset < 1000 && showToTopBtn) {
+        setState(() {
+          showToTopBtn = false;
+        });
+      } else if (_controller.offset >= 1000 && showToTopBtn == false) {
+        setState(() {
+          showToTopBtn = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    //为了避免内存泄露，需要调用_controller.dispose
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("滚动控制")),
+      body: Scrollbar(
+        child: ListView.builder(
+            itemCount: 100,
+            itemExtent: 50.0, //列表项高度固定时，显式指定高度是一个好习惯(性能消耗小)
+            controller: _controller,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text("$index"),
+              );
+            }),
+      ),
+      floatingActionButton: !showToTopBtn
+          ? null
+          : FloatingActionButton(
+              child: Icon(Icons.arrow_upward),
+              onPressed: () {
+                //返回到顶部时执行动画
+                _controller.animateTo(.0,
+                    duration: Duration(milliseconds: 200), curve: Curves.ease);
+              }),
+    );
+  }
+}
+
+class CustomScrollViewTestRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    //因为本路由没有使用Scaffold，为了让子级Widget(如Text)使用
+    //Material Design 默认的样式风格,我们使用Material作为本路由的根。
+    return Material(
+      child: CustomScrollView(
+        slivers: <Widget>[
+          //AppBar，包含一个导航栏
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 250.0,
+            flexibleSpace: FlexibleSpaceBar(
+              title: const Text('Demo'),
+              background: Image.asset(
+                "./images/avatar.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          SliverPadding(
+            padding: const EdgeInsets.all(8.0),
+            sliver: new SliverGrid(
+              //Grid
+              gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, //Grid按两列显示
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0,
+                childAspectRatio: 4.0,
+              ),
+              delegate: new SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  //创建子widget
+                  return new Container(
+                    alignment: Alignment.center,
+                    color: Colors.cyan[100 * (index % 9)],
+                    child: new Text('grid item $index'),
+                  );
+                },
+                childCount: 20,
+              ),
+            ),
+          ),
+          //List
+          new SliverFixedExtentList(
+            itemExtent: 50.0,
+            delegate: new SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+              //创建列表项
+              return new Container(
+                alignment: Alignment.center,
+                color: Colors.lightBlue[100 * (index % 9)],
+                child: new Text('list item $index'),
+              );
+            }, childCount: 50 //50个列表项
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GridViewRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("gridview"),
+      ),
+      body: InfiniteGridView(),
+    );
+  }
+}
+
+class InfiniteGridView extends StatefulWidget {
+  @override
+  _InfiniteGridViewState createState() => new _InfiniteGridViewState();
+}
+
+class _InfiniteGridViewState extends State<InfiniteGridView> {
+  List<IconData> _icons = []; //保存Icon数据
+
+  @override
+  void initState() {
+    // 初始化数据
+    _retrieveIcons();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3, //每行三列
+            childAspectRatio: 1.0 //显示区域宽高相等
+            ),
+        itemCount: _icons.length,
+        itemBuilder: (context, index) {
+          //如果显示到最后一个并且Icon总数小于200时继续获取数据
+          if (index == _icons.length - 1 && _icons.length < 200) {
+            _retrieveIcons();
+          }
+          return Icon(_icons[index]);
+        });
+  }
+
+  //模拟异步获取数据
+  void _retrieveIcons() {
+    Future.delayed(Duration(milliseconds: 200)).then((e) {
+      setState(() {
+        _icons.addAll([
+          Icons.ac_unit,
+          Icons.airport_shuttle,
+          Icons.all_inclusive,
+          Icons.beach_access,
+          Icons.cake,
+          Icons.free_breakfast
+        ]);
+      });
+    });
+  }
+}
+
+class ListViewRoute extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: AppBar(
+        title: Text("listView"),
+      ),
+      body: Column(
+        children: <Widget>[
+          FlatButton(
+            child: Text("ListView"),
+            textColor: Colors.blue,
+            onPressed: () {
+              Navigator.push(context, new MaterialPageRoute(builder: (context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text("ListView"),
+                  ),
+                  body: new ListView3(),
+                );
+              }));
+            },
+          ),
+          FlatButton(
+            child: Text("无限上拉列表"),
+            textColor: Colors.blue,
+            onPressed: () {
+              Navigator.push(context, new MaterialPageRoute(builder: (context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text("无限上拉列表"),
+                  ),
+                  body: new InfiniteListView(),
+                );
+              }));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ListView3 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    //下划线widget预定义以供复用。
+    Widget divider1 = Divider(
+      color: Colors.blue,
+    );
+    Widget divider2 = Divider(color: Colors.green);
+
+    return Column(
+      children: <Widget>[
+        ListTile(
+          title: Text("商品列表"),
+        ),
+        Expanded(
+          child: ListView.builder(
+              padding: EdgeInsets.all(8.0),
+              itemCount: 20,
+              itemExtent: 60.0,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: Center(child: Text('toly $index')),
+                );
+              }),
+        )
+      ],
+    );
+  }
+}
+
+class InfiniteListView extends StatefulWidget {
+  @override
+  _InfiniteListViewState createState() => new _InfiniteListViewState();
+}
+
+class _InfiniteListViewState extends State<InfiniteListView> {
+  static const loadingTag = "##loading##"; //表尾标记
+  var _words = <String>[loadingTag];
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: _words.length,
+      itemBuilder: (context, index) {
+        //如果到了表尾
+        if (_words[index] == loadingTag) {
+          //不足100条，继续获取数据
+          if (_words.length - 1 < 100) {
+            //获取数据
+            _retrieveData();
+            //加载时显示loading
+            return Container(
+              padding: const EdgeInsets.all(16.0),
+              alignment: Alignment.center,
+              child: SizedBox(
+                  width: 24.0,
+                  height: 24.0,
+                  child: CircularProgressIndicator(strokeWidth: 2.0)),
+            );
+          } else {
+            //已经加载了100条数据，不再获取数据。
+            return Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  "没有更多了",
+                  style: TextStyle(color: Colors.grey),
+                ));
+          }
+        }
+        //显示单词列表项
+        return ListTile(title: Text(_words[index]));
+      },
+      separatorBuilder: (context, index) => Divider(height: .0),
+    );
+  }
+
+  void _retrieveData() {
+    Future.delayed(Duration(seconds: 2)).then((e) {
+      _words.insertAll(
+          _words.length - 1,
+          //每次生成20个单词
+          generateWordPairs().take(20).map((e) => e.asPascalCase).toList());
+      setState(() {
+        //重新构建列表
+      });
+    });
+  }
+}
+
+class ScrollViewRoute extends StatelessWidget {
+  String str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("SingleChildScrollView"),
+      ),
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              // 动态创建一个List<Widget>
+              children: str
+                  .split("")
+                  // 每一个字母都用Text显示，字体为原来的两倍
+                  .map((c) => Text(
+                        c,
+                        textScaleFactor: 2.0,
+                      ))
+                  .toList(),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -234,8 +772,8 @@ class ContainerRoute extends StatelessWidget {
               onPressed: () {
                 Navigator.push(context,
                     new MaterialPageRoute(builder: (context) {
-                      return new ScaffoldRoute();
-                    }));
+                  return new ScaffoldRoute();
+                }));
               },
             ),
           ],
@@ -250,11 +788,12 @@ class ScaffoldRoute extends StatefulWidget {
   _ScaffoldRouteState createState() => _ScaffoldRouteState();
 }
 
-class _ScaffoldRouteState extends State<ScaffoldRoute> with SingleTickerProviderStateMixin{
+class _ScaffoldRouteState extends State<ScaffoldRoute>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 1;
   TabController _tabController; //需要定义一个Controller
   List tabs = ["新闻", "历史", "图片"];
-  
+
   @override
   void initState() {
     super.initState();
@@ -265,11 +804,12 @@ class _ScaffoldRouteState extends State<ScaffoldRoute> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar( //导航栏
-        bottom: TabBar(   //生成Tab菜单
+      appBar: AppBar(
+        //导航栏
+        bottom: TabBar(
+            //生成Tab菜单
             controller: _tabController,
-            tabs: tabs.map((e) => Tab(text: e)).toList()
-        ),
+            tabs: tabs.map((e) => Tab(text: e)).toList()),
         title: Text("App Name"),
         leading: Builder(builder: (context) {
           return IconButton(
@@ -280,20 +820,23 @@ class _ScaffoldRouteState extends State<ScaffoldRoute> with SingleTickerProvider
             },
           );
         }),
-        actions: <Widget>[ //导航栏右侧菜单
+        actions: <Widget>[
+          //导航栏右侧菜单
           IconButton(icon: Icon(Icons.share), onPressed: () {}),
         ],
       ),
       body: TabBarView(
         controller: _tabController,
-        children: tabs.map((e) { //创建3个Tab页
+        children: tabs.map((e) {
+          //创建3个Tab页
           return Container(
             alignment: Alignment.center,
             child: Text(e, textScaleFactor: 5),
           );
         }).toList(),
       ),
-      drawer: new MyDrawer(), //抽屉
+      drawer: new MyDrawer(),
+      //抽屉
 //      bottomNavigationBar: BottomNavigationBar( // 底部导航
 //        items: <BottomNavigationBarItem>[
 //          BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
@@ -317,9 +860,9 @@ class _ScaffoldRouteState extends State<ScaffoldRoute> with SingleTickerProvider
         ),
       ),
       //打洞
-      floatingActionButtonLocation: FloatingActionButtonLocation
-          .centerDocked,
-      floatingActionButton: FloatingActionButton( //悬浮按钮
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        //悬浮按钮
         child: Icon(Icons.add),
         onPressed: _onAdd,
       ),
@@ -331,8 +874,8 @@ class _ScaffoldRouteState extends State<ScaffoldRoute> with SingleTickerProvider
       _selectedIndex = index;
     });
   }
-  void _onAdd(){
-  }
+
+  void _onAdd() {}
 }
 
 class MyDrawer extends StatelessWidget {

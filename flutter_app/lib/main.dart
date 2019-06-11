@@ -3,11 +3,13 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:math' as math;
-
+import 'ghflutter.dart';
+import 'strings.dart';
 import 'InheritedWidget.dart';
 import 'LoginTestRoute.dart';
 import 'PointerEventRoute.dart';
 import 'ThemeTestRoute.dart';
+import 'dart:convert';
 
 void main() => runApp(MyApp());
 
@@ -197,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(context,
                     new MaterialPageRoute(builder: (context) {
-                      return new LoginTestRoute();
+                      return new GHFlutter();
                     }));
               },
             ),

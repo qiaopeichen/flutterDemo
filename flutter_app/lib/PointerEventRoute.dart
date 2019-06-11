@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
-import 'InheritedWidget.dart';
 
 class PointerParentRoute extends StatelessWidget {
   @override
@@ -61,10 +57,18 @@ class PointerParentRoute extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(context,
                         new MaterialPageRoute(builder: (context) {
-                          return _GestureRecognizerTestRoute();
-                        }));
+                      return _GestureRecognizerTestRoute();
+                    }));
                   },
                   child: Text("GestureRecognizer")),
+              FlatButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        new MaterialPageRoute(builder: (context) {
+                          return BothDirectionTestRoute();
+                        }));
+                  },
+                  child: Text("手势竞争")),
             ],
           ),
         ));
@@ -306,27 +310,21 @@ class _GestureRecognizerTestRouteState
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text.rich(
-            TextSpan(
-                children: [
-                  TextSpan(text: "你好世界"),
-                  TextSpan(
-                    text: "点我变色",
-                    style: TextStyle(
-                        fontSize: 30.0,
-                        color: _toggle ? Colors.blue : Colors.red
-                    ),
-                    recognizer: _tapGestureRecognizer
-                      ..onTap = () {
-                        setState(() {
-                          _toggle = !_toggle;
-                        });
-                      },
-                  ),
-                  TextSpan(text: "你好世界"),
-                ]
-            )
-        ),
+        child: Text.rich(TextSpan(children: [
+          TextSpan(text: "你好世界"),
+          TextSpan(
+            text: "点我变色",
+            style: TextStyle(
+                fontSize: 30.0, color: _toggle ? Colors.blue : Colors.red),
+            recognizer: _tapGestureRecognizer
+              ..onTap = () {
+                setState(() {
+                  _toggle = !_toggle;
+                });
+              },
+          ),
+          TextSpan(text: "你好世界"),
+        ])),
       ),
     );
   }
@@ -336,5 +334,47 @@ class _GestureRecognizerTestRoute extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _GestureRecognizerTestRouteState();
+  }
+}
+
+class BothDirectionTestRoute extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return BothDirectionTestRouteState();
+  }
+}
+
+class BothDirectionTestRouteState extends State<BothDirectionTestRoute> {
+  double _top = 0.0;
+  double _left = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Positioned(
+            top: _top,
+            left: _left,
+            child: GestureDetector(
+              child: CircleAvatar(
+                child: Text("A"),
+              ),
+              // 垂直方向拖动事件
+              onVerticalDragUpdate: (DragUpdateDetails details) {
+                setState(() {
+                  _top += details.delta.dy;
+                });
+              },
+              onHorizontalDragUpdate: (DragUpdateDetails details) {
+                setState(() {
+                  _left += details.delta.dx;
+                });
+              },
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
